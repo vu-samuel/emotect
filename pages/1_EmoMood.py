@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 import sys
+import os
 from pathlib import Path
 from datetime import datetime, timedelta
 from utils.emomood_pdf_generator import generate_emomood_html
@@ -61,9 +62,6 @@ else:
 
 df = df[df["date"].between(pd.to_datetime(start_date), pd.to_datetime(end_date))]
 date_range_str = f"{start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}"
-
-
-
 
 # === Aggregate Current Period ===
 current_df = df[df["date"].between(pd.to_datetime(start_date), pd.to_datetime(end_date))]
@@ -186,10 +184,11 @@ if selected_tickers:
     selected_data["Avg Sentiment"] = selected_data["Avg Sentiment"].apply(lambda x: f"{x:.2f}")
     st.dataframe(selected_data, use_container_width=True)
 
-# === Export PDF Report ===
-if st.button("📄 Export EmotiForecast PDF"):
-    export_df = highlight_df if selected_tickers else map_df
-    path = generate_emomood_html(export_df, date_range_str)
 
-    st.success("PDF report created.")
-    st.download_button("📥 Download PDF", open(path, "rb"), file_name=f"EmotiForecast_{date_range_str}.pdf")
+# === Optional HTML Export ===
+st.markdown("---")
+st.markdown("### Export EmotiForecast Report")
+generate_emomood_html(
+    highlight_df,
+    date_range_str
+)
