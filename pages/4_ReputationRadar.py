@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 from config import DUMMY_FULL_SENTIMENT_FILE
-from utils.reputation_report_generator import generate_reputation_pdf
+from utils.reputation_report_generator import generate_reputation_html
 
 # === ESG Keyword Definitions ===
 ESG_KEYWORDS = {
@@ -153,7 +153,7 @@ else:
 # === PDF Export ===
 if st.button("📄 Export Reputation PDF"):
     with st.spinner("Generating PDF report..."):
-        path = generate_reputation_pdf(selected_ticker, df_esg_filtered, start_date=start_date, end_date=end_date)
+        path = generate_reputation_html(selected_ticker, df_esg_filtered, start_date=start_date, end_date=end_date)
 
         st.success("PDF ready.")
         st.download_button("📥 Download PDF", open(path, "rb"), file_name=f"{selected_ticker}_reputation_report.pdf")
