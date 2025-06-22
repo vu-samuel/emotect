@@ -4,7 +4,7 @@ import plotly.graph_objects as go
 import sys
 from pathlib import Path
 from datetime import datetime, timedelta
-from utils.emomood_pdf_generator import generate_emomood_pdf
+from utils.emomood_pdf_generator import generate_emomood_html
 
 # === Farben definieren ===
 PRIMARY_BLUE = "#0F4C81"
@@ -35,7 +35,7 @@ range_options = {"Past 1 Day": 1, "Past 7 Days": 7, "Past 14 Days": 14, "Past 30
 selected_range = st.sidebar.selectbox("Aggregate sentiment over:", list(range_options.keys()))
 
 # === Legend for Sentiment Colors
-st.sidebar.markdown("""
+st.markdown("""
 <div style="margin-top: 20px; padding: 1rem 1.5rem; background-color: #f5f5f5; border-radius: 8px;">
     <h4 style="margin-top: 0; color: #0F4C81;">Legend – Sentiment Color Scale</h4>
     <ul style="list-style: none; padding-left: 0; font-size: 15px;">
@@ -189,7 +189,7 @@ if selected_tickers:
 # === Export PDF Report ===
 if st.button("📄 Export EmotiForecast PDF"):
     export_df = highlight_df if selected_tickers else map_df
-    path = generate_emomood_pdf(export_df, date_range_str)
+    path = generate_emomood_html(export_df, date_range_str)
 
     st.success("PDF report created.")
     st.download_button("📥 Download PDF", open(path, "rb"), file_name=f"EmotiForecast_{date_range_str}.pdf")

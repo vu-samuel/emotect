@@ -21,7 +21,7 @@ st.markdown("""
 # === Imports aus Projektstruktur ===
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 from config import DUMMY_FULL_SENTIMENT_FILE, COMPANY_INFO
-from utils.negative_pressure_report_generator import generate_negative_pressure_pdf
+from utils.negative_pressure_report_generator import generate_negative_pressure_html
 
 # === Schlüsselwörter
 RISK_KEYWORDS = [
@@ -222,7 +222,7 @@ else:
             with zipfile.ZipFile(zip_temp.name, 'w') as zf:
                 for _, row in active_alerts.iterrows():
                     ticker = row["ticker"]
-                    path = generate_negative_pressure_pdf(row["ticker"], volcano_df, weekly_df, date_range_str)
+                    path = generate_negative_pressure_html(row["ticker"], volcano_df, weekly_df, date_range_str)
                     zf.write(path, arcname=path.name)
             st.success("ZIP file created.")
             st.download_button("📥 Download ZIP", open(zip_temp.name, "rb"), file_name="emotect_alert_reports.zip")
@@ -232,7 +232,7 @@ else:
         alert_msg = row["alert"]
         st.error(f"{alert_msg} – {name} ({row['ticker']}) | Level: {row['level'].capitalize()}, Pressure: {row['pressure']}")
         if st.button(f"📄 PDF for {name} ({row['ticker']})", key=row["ticker"]):
-            path = generate_negative_pressure_pdf(
+            path = generate_negative_pressure_html(
                 row["ticker"],
                 volcano_df,
                 weekly_df,

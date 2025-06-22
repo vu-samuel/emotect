@@ -15,7 +15,7 @@ import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 from config import DUMMY_FULL_SENTIMENT_FILE, DUMMY_Z_SCORE_FILE, COMPANY_INFO, EMOTECT_LOGO
-from utils.zscore_report_generator import generate_zscore_pdf
+from utils.zscore_report_generator import generate_zscore_html
 from pathlib import Path
 # === Page Configuration ===
 st.set_page_config(layout="wide", page_title="🌋 EMOTECT | Z-Score Analyzer", page_icon="🌋")
@@ -164,7 +164,7 @@ st.dataframe(extremes[["date", "sentiment_score", "z_score"]].sort_values("z_sco
 
 # === Export PDF ===
 if st.button("Export Z-Score Report as PDF"):
-    path = generate_zscore_pdf(ticker=ticker, df_daily=df_daily, company_name=selected_name, article_snippets=None)
+    path = generate_zscore_html(ticker=ticker, df_daily=df_daily, company_name=selected_name, article_snippets=None)
     st.success("PDF report created.")
     st.download_button("Download PDF", open(path, "rb"), file_name=path.name)
 
