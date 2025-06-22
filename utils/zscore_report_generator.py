@@ -1,33 +1,32 @@
 import os
 import tempfile
-import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 from jinja2 import Environment, FileSystemLoader
-from weasyprint import HTML
 from wordcloud import WordCloud
 from pathlib import Path
 import pandas as pd
 import sys
 from datetime import datetime
+import pdfkit
+
+# === Configuration for Streamlit Cloud ===
+config = pdfkit.configuration(wkhtmltopdf='/usr/bin/wkhtmltopdf')
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 from config import COMPANY_INFO
 
-# === Setup Jinja2 environment ===
+# === Jinja2 Template Directory ===
 TEMPLATE_DIR = Path(__file__).resolve().parent.parent / "templates"
 TEMPLATE_FILE = TEMPLATE_DIR / "zscore_report.html"
 
 def generate_zscore_pdf(ticker, df_daily, company_name=None, article_snippets=None):
-    # === Metadata ===
     company_name = company_name or COMPANY_INFO.get(ticker, {}).get("name", ticker)
     date_range = f"{df_daily['date'].min().date()} to {df_daily['date'].max().date()}"
-    window = "N/A"
-    if "mean" in df_daily.columns:
-        window = df_daily["mean"].first_valid_index() or "N/A"
+    window = df_daily["mean"].first_valid_index() or "N/A" if "mean" in df_daily.columns else "N/A"
 
     latest_row = df_daily.dropna(subset=["z_score"]).iloc[-1]
     latest_z = round(latest_row["z_score"], 2)
-    
+
     if abs(latest_z) >= 2:
         zscore_status = "Severe emotional shock"
     elif abs(latest_z) >= 1:
@@ -35,7 +34,6 @@ def generate_zscore_pdf(ticker, df_daily, company_name=None, article_snippets=No
     else:
         zscore_status = "Stable sentiment"
 
-    # === Create temp image folder ===
     with tempfile.TemporaryDirectory() as tmpdir:
         zscore_plot_path = os.path.join(tmpdir, "zscore_chart.png")
         gauge_path = os.path.join(tmpdir, "gauge_chart.png")
@@ -54,7 +52,7 @@ def generate_zscore_pdf(ticker, df_daily, company_name=None, article_snippets=No
         fig1.update_layout(title="Z-Score Over Time", xaxis_title="Date", yaxis_title="Z-Score")
         fig1.write_image(zscore_plot_path)
 
-        # === Gauge Plot ===
+        # === Gauge Chart ===
         fig2 = go.Figure(go.Indicator(
             mode="gauge+number",
             value=latest_z,
@@ -80,13 +78,12 @@ def generate_zscore_pdf(ticker, df_daily, company_name=None, article_snippets=No
 
         # === Extreme Days Table ===
         extreme_df = df_daily[abs(df_daily["z_score"]) >= 2]
-        table_data = extreme_df[["date", "sentiment_score", "z_score"]] \
-            .sort_values("z_score", ascending=False) \
-            .to_dict(orient="records")
-        extreme_table = table_data if table_data else None  # ✅ korrekt prüfen
+        extreme_table = extreme_df[["date", "sentiment_score", "z_score"]] \
+            .sort_values("z_score", ascending=False).to_dict(orient="records")
+
+        # === Render HTML ===
         env = Environment(loader=FileSystemLoader(str(TEMPLATE_DIR)))
-        template = env.get_template(TEMPLATE_FILE.name)  # ✅ Das fehlte!
-        # === Render Template ===
+        template = env.get_template(TEMPLATE_FILE.name)
         html_out = template.render(
             company_name=company_name,
             ticker=ticker,
@@ -96,16 +93,15 @@ def generate_zscore_pdf(ticker, df_daily, company_name=None, article_snippets=No
             zscore_status=zscore_status,
             zscore_plot_path=zscore_plot_path,
             gauge_path=gauge_path,
-            extreme_table=extreme_table,  # ✅ das ist entscheidend
+            extreme_table=extreme_table,
             now=datetime.now().strftime("%Y-%m-%d %H:%M")
         )
 
-
         # === Save PDF ===
         pdf_path = os.path.join(tmpdir, f"Zscore_Report_{ticker}_{datetime.now().date()}.pdf")
-        HTML(string=html_out, base_url=".").write_pdf(pdf_path)
+        pdfkit.from_string(html_out, str(pdf_path), configuration=config)
 
-        # === Copy PDF to permanent place
+        # === Final Copy
         final_path = os.path.join("exports", os.path.basename(pdf_path))
         os.makedirs("exports", exist_ok=True)
         with open(pdf_path, "rb") as src, open(final_path, "wb") as dst:

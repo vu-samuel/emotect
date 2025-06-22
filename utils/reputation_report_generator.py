@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 from jinja2 import Environment, FileSystemLoader
-from weasyprint import HTML
+import pdfkit
 from pathlib import Path
 import tempfile
 from datetime import datetime
@@ -23,15 +23,13 @@ def matches_esg_category(text):
     return matches
 
 def generate_reputation_pdf(ticker, df_filtered, start_date, end_date):
-    # === ESG-Tags zuweisen ===
     df_filtered["esg_tags"] = df_filtered["combined_text"].apply(matches_esg_category)
 
-    # === Wordcloud generieren ===
+    # === Wordcloud ===
     wc_text = " ".join(df_filtered["combined_text"])
     wc = WordCloud(width=800, height=300, background_color="white").generate(wc_text)
     wordcloud_path = Path(tempfile.NamedTemporaryFile(suffix=".png", delete=False).name)
     wc.to_file(wordcloud_path)
-    wordcloud_uri = wordcloud_path.resolve().as_uri()
 
     # === ESG Breakdown Chart ===
     esg_counts = {"E": 0, "S": 0, "G": 0}
@@ -47,36 +45,35 @@ def generate_reputation_pdf(ticker, df_filtered, start_date, end_date):
     plt.tight_layout()
     plt.savefig(esg_chart_path)
     plt.close()
-    esg_chart_uri = esg_chart_path.resolve().as_uri()
 
-    # === Source Table
+    # === Source Table ===
+    sources = []
     if "source" in df_filtered.columns:
         sources_df = df_filtered["source"].dropna().value_counts().reset_index()
         sources_df.columns = ["Source", "Count"]
         sources = sources_df.to_dict(orient="records")
-    else:
-        sources = []
 
-    # === Template Setup
+    # === Jinja2 Template Rendering ===
     template_dir = Path(__file__).resolve().parent.parent / "templates"
     env = Environment(loader=FileSystemLoader(str(template_dir)))
     template = env.get_template("reputation_report_template.html")
 
     html_out = template.render(
         company=ticker,
-        wordcloud_path=wordcloud_uri,
-        esg_chart_path=esg_chart_uri,
+        wordcloud_path=wordcloud_path.resolve().as_uri(),
+        esg_chart_path=esg_chart_path.resolve().as_uri(),
         sources=sources,
         start_date=start_date.strftime("%Y-%m-%d"),
         end_date=end_date.strftime("%Y-%m-%d"),
-        generated_on=datetime.now().strftime("%Y-%m-%d %H:%M")
+        generated_on=datetime.now().strftime("%Y-%m-%d %H:%M"),
+        logo_path=Path("assets/emotect_logo.png").resolve().as_uri()
     )
 
-    # === Export-Dateiname mit Datum
+    # === PDF File Name with Dates
     pdf_filename = f"{ticker}_Reputation_{start_date.strftime('%Y%m%d')}_{end_date.strftime('%Y%m%d')}.pdf"
     pdf_path = Path(tempfile.gettempdir()) / pdf_filename
 
-    # === PDF exportieren mit korrektem base_url
-    HTML(string=html_out, base_url=str(template_dir.parent)).write_pdf(str(pdf_path))
+    # === Export via pdfkit
+    pdfkit.from_string(html_out, str(pdf_path))  # optional: configuration=config
 
     return pdf_path

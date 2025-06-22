@@ -38,3 +38,4 @@ Pillow
 weasyprint
 jinja2
 kaleido
+pdfkit
