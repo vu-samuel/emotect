@@ -2,10 +2,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 from jinja2 import Environment, FileSystemLoader
-from weasyprint import HTML
 from pathlib import Path
 import tempfile
 from datetime import datetime
+from utils.html_export_utils import offer_html_download
 
 # === ESG Schlüsselwörter ===
 ESG_KEYWORDS = {
@@ -22,7 +22,7 @@ def matches_esg_category(text):
             matches.append(cat)
     return matches
 
-def generate_reputation_pdf(ticker, df_filtered, start_date, end_date):
+def generate_reputation_html(ticker, df_filtered, start_date, end_date):
     df_filtered["esg_tags"] = df_filtered["combined_text"].apply(matches_esg_category)
 
     # === Wordcloud ===
@@ -69,11 +69,4 @@ def generate_reputation_pdf(ticker, df_filtered, start_date, end_date):
         logo_path=Path("assets/emotect_logo.png").resolve().as_uri()
     )
 
-    # === PDF File Name with Dates ===
-    pdf_filename = f"{ticker}_Reputation_{start_date.strftime('%Y%m%d')}_{end_date.strftime('%Y%m%d')}.pdf"
-    pdf_path = Path(tempfile.gettempdir()) / pdf_filename
-
-    # === Export via WeasyPrint ===
-    HTML(string=html_out, base_url=str(template_dir.resolve())).write_pdf(str(pdf_path))
-
-    return pdf_path
+    offer_html_download(html_out, filename=f"{ticker}_Reputation_{start_date.strftime('%Y%m%d')}_{end_date.strftime('%Y%m%d')}.html")

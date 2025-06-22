@@ -3,15 +3,14 @@ import tempfile
 import pandas as pd
 from pathlib import Path
 from datetime import datetime
-from weasyprint import HTML
+from utils.html_export_utils import offer_html_download
 
-def generate_emomood_pdf(export_df, date_range_str):
-    # === Template-Verzeichnis festlegen ===
-    template_dir = Path("templates")
-    env = Environment(loader=FileSystemLoader(template_dir))
+
+def generate_emomood_html(export_df, date_range_str):
+    template_dir = Path(__file__).resolve().parent.parent / "templates"
+    env = Environment(loader=FileSystemLoader(str(template_dir)))
     template = env.get_template("mood_report.html")
 
-    # === HTML rendern ===
     html_out = template.render(
         date_range=date_range_str,
         avg_sentiment=round(export_df["sentiment"].mean(), 3) if not export_df.empty else 0.0,
@@ -28,8 +27,4 @@ def generate_emomood_pdf(export_df, date_range_str):
         ]
     )
 
-    # === Temporäre PDF-Datei erstellen und HTML dort reinschreiben ===
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmpfile:
-        pdf_path = Path(tmpfile.name)
-        HTML(string=html_out, base_url=str(template_dir.resolve())).write_pdf(str(pdf_path))
-        return pdf_path
+    offer_html_download(html_out, filename=f"Emomood_Report_{datetime.now().date()}.html")

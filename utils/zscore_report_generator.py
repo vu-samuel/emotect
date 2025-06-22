@@ -6,7 +6,7 @@ from pathlib import Path
 import pandas as pd
 import sys
 from datetime import datetime
-from weasyprint import HTML
+import streamlit as st
 
 # === Projekt-Config laden ===
 sys.path.append(str(Path(__file__).resolve().parent.parent))
@@ -16,7 +16,24 @@ from config import COMPANY_INFO
 TEMPLATE_DIR = Path(__file__).resolve().parent.parent / "templates"
 TEMPLATE_FILE = TEMPLATE_DIR / "zscore_report.html"
 
-def generate_zscore_pdf(ticker, df_daily, company_name=None, article_snippets=None):
+def offer_html_download(html_out: str, filename: str = "report.html"):
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".html", mode="w", encoding="utf-8") as tmpfile:
+        tmpfile.write(html_out)
+        tmpfile_path = tmpfile.name
+
+    with open(tmpfile_path, "r", encoding="utf-8") as f:
+        html_bytes = f.read().encode("utf-8")
+
+    st.download_button(
+        label="📄 Download HTML Report",
+        data=html_bytes,
+        file_name=filename,
+        mime="text/html"
+    )
+
+    st.info("Tipp: Nach dem Öffnen im Browser einfach **Strg + P** drücken und als PDF speichern.")
+
+def generate_zscore_html_report(ticker, df_daily, company_name=None):
     company_name = company_name or COMPANY_INFO.get(ticker, {}).get("name", ticker)
     date_range = f"{df_daily['date'].min().date()} to {df_daily['date'].max().date()}"
     window = df_daily["mean"].first_valid_index() or "N/A" if "mean" in df_daily.columns else "N/A"
@@ -94,10 +111,4 @@ def generate_zscore_pdf(ticker, df_daily, company_name=None, article_snippets=No
             now=datetime.now().strftime("%Y-%m-%d %H:%M")
         )
 
-        # === Save PDF with WeasyPrint ===
-        pdf_path = os.path.join("exports", f"Zscore_Report_{ticker}_{datetime.now().date()}.pdf")
-        os.makedirs("exports", exist_ok=True)
-
-        HTML(string=html_out, base_url=str(TEMPLATE_DIR.resolve())).write_pdf(pdf_path)
-
-        return Path(pdf_path)
+        offer_html_download(html_out, filename=f"Zscore_Report_{ticker}_{datetime.now().date()}.html")

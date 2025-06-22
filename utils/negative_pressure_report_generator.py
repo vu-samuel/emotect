@@ -4,19 +4,16 @@ from jinja2 import Environment, FileSystemLoader
 import tempfile
 import plotly.express as px
 import pandas as pd
-from weasyprint import HTML
+from utils.html_export_utils import offer_html_download
 
-# === Setup ===
-TEMPLATE_DIR = Path(__file__).resolve().parent.parent / "templates"
-TEMPLATE_FILE = "pressure_report.html"
-env = Environment(loader=FileSystemLoader(str(TEMPLATE_DIR)))
-template = env.get_template(TEMPLATE_FILE)
+template_dir = Path(__file__).resolve().parent.parent / "templates"
+template_file = "pressure_report.html"
+env = Environment(loader=FileSystemLoader(str(template_dir)))
+template = env.get_template(template_file)
 
-# === Chart Helper ===
 def save_pressure_chart(weekly_df, ticker, title, filename):
     company_data = weekly_df[weekly_df["ticker"] == ticker].copy()
 
-    # Format x-axis
     if pd.api.types.is_datetime64_any_dtype(company_data["week"]):
         company_data["week"] = company_data["week"].dt.strftime("%Y-%m-%d")
     elif pd.api.types.is_period_dtype(company_data["week"]):
@@ -35,27 +32,23 @@ def save_pressure_chart(weekly_df, ticker, title, filename):
     fig.write_image(str(tmp_img), scale=2)
     return tmp_img
 
-# === Main Function ===
-def generate_negative_pressure_pdf(ticker, volcano_df, weekly_df, date_range_str):
+def generate_pressure_html(ticker, volcano_df, weekly_df, date_range_str):
     company_row = volcano_df[volcano_df["ticker"] == ticker].iloc[0]
     company_name = company_row.get("name", ticker)
     pressure = int(company_row["pressure"])
     level = company_row["level"].capitalize()
     alert = company_row["alert"] or "No Alert"
 
-    # === Charts ===
     line_chart_path = save_pressure_chart(
         weekly_df, ticker,
         title="Weekly Pressure Trend",
         filename=f"{ticker}_weekly_chart.png"
     )
 
-    # === Table Data ===
     trend_table = weekly_df[weekly_df["ticker"] == ticker][["week", "risk_hits_total"]]
     trend_table = trend_table.sort_values("week", ascending=False)
     trend_rows = trend_table.to_dict(orient="records")
 
-    # === Template Context ===
     context = {
         "company_name": company_name,
         "ticker": ticker,
@@ -70,10 +63,4 @@ def generate_negative_pressure_pdf(ticker, volcano_df, weekly_df, date_range_str
     }
 
     html_out = template.render(**context)
-
-    # === PDF Export ===
-    filename = f"EMOTECT_PressureReport_{ticker}_{datetime.now().strftime('%Y%m%d')}.pdf"
-    filepath = Path(tempfile.gettempdir()) / filename
-
-    HTML(string=html_out, base_url=str(TEMPLATE_DIR.resolve())).write_pdf(str(filepath))
-    return filepath
+    offer_html_download(html_out, filename=f"EMOTECT_PressureReport_{ticker}_{datetime.now().strftime('%Y%m%d')}.html")
