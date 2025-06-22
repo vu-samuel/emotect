@@ -1,0 +1,41 @@
+# === Python Cache ===
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.ipynb_checkpoints/
+
+# === Virtual Environment ===
+venv/
+.env/
+.envrc
+*.env
+
+# === Log Files ===
+logs/
+*.log
+
+# === Data Files (anpassen je nach Releasestand) ===
+exports/
+
+# === System Files ===
+.DS_Store
+Thumbs.db
+._*
+
+# === IDE/Editor ===
+.vscode/
+.idea/
+
+# === Output Files ===
+*.pdf
+*.xlsx
+*.zip
+*.tmp
+*.bak
+
+# === Node/Web (nur falls Web-Dashboards geplant) ===
+node_modules/
+dist/
+build/

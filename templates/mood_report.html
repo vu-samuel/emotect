@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EMOTECT EmotiForecast Report – {{ date_range }}</title>
+    <style>
+        body {
+            font-family: "Helvetica", sans-serif;
+            margin: 40px;
+            color: #1b1f2d;
+            font-size: 13px;
+        }
+
+        .logo-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #ccc;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+        }
+
+        .logo-header img {
+            height: 40px;
+        }
+
+        h1 {
+            font-size: 22px;
+            margin: 0;
+            color: #1b1f2d;
+        }
+
+        h2 {
+            font-size: 16px;
+            margin-top: 40px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+            color: #2c3e50;
+        }
+
+        .metric {
+            margin: 15px 0;
+            padding: 12px 16px;
+            background-color: #f5f5f5;
+            border-left: 4px solid #1b3c6e;
+        }
+
+        .company-entry {
+            margin-bottom: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 20px;
+            left: 40px;
+            right: 40px;
+            font-size: 11px;
+            color: #888;
+            border-top: 1px solid #ccc;
+            padding-top: 6px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .small {
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="logo-header">
+        <img src="{{ logo_path }}" alt="EMOTECT Logo">
+        <h1>EmotiForecast Report</h1>
+    </div>
+
+    <p class="small">Reporting period: {{ date_range }}</p>
+
+    <h2>Overall Metrics</h2>
+    <div class="metric">
+        <strong>Average Sentiment:</strong>
+        {{ avg_sentiment|round(2) }}
+    </div>
+    <div class="metric">
+        <strong>Change from Previous Period:</strong>
+        {% if delta_sentiment > 0 %}
+            +{{ delta_sentiment|round(2) }}
+        {% else %}
+            {{ delta_sentiment|round(2) }}
+        {% endif %}
+    </div>
+
+    <h2>Company Sentiment Summary</h2>
+    {% for row in data %}
+    <div class="company-entry">
+        <strong>{{ row.name }} ({{ row.ticker }})</strong><br>
+        Sentiment: {{ row.sentiment|round(2) }}
+    </div>
+    {% endfor %}
+
+    <div class="footer">
+        <span>Generated on {{ timestamp }}</span>
+        <span>Confidential – Internal Use Only</span>
+    </div>
+
+</body>
+</html>

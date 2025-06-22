@@ -1,0 +1,24 @@
+[
+  {
+    "date": "2025-06-12",
+    "ticker": "AIR",
+    "company_name": "Airbus SE",
+    "title": "Airbus sees global aircraft fleet doubling by 2044, led by India",
+    "description": "The global in-service fleet will swell by 24,480 units to 49,210 aircraft in 2044, Airbus predicted in its latest global market forecast",
+    "url": "https://www.bloomberg.com/news/articles/2025-06-12/airbus-sees-global-aircraft-fleet-doubling-by-2044-led-by-india",
+    "source": "Bloomberg",
+    "sentiment_score": 0.0,
+    "sentiment_label": "neutral"
+  },
+  {
+    "date": "2025-06-04",
+    "ticker": "AIR",
+    "company_name": "Airbus SE",
+    "title": "Global carriers pile on India capacity as US-Europe traffic drops",
+    "description": "India is already the world’s third-largest domestic aviation market and the country’s rising middle class makes the nation of more than 1.4 billion people a crucial driver of future growth",
+    "url": "https://www.bloomberg.com/news/articles/2025-06-04/global-carriers-pile-on-india-capacity-as-us-europe-traffic-drops",
+    "source": "Bloomberg",
+    "sentiment_score": 0.3818,
+    "sentiment_label": "positive"
+  }
+]

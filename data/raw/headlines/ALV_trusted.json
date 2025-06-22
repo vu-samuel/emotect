@@ -1,0 +1,24 @@
+[
+  {
+    "date": "2025-06-10",
+    "ticker": "ALV",
+    "company_name": "Allianz SE",
+    "title": "Bulgaria is set to join the euro zone. But its citizens aren't convinced",
+    "description": "The European Commission and European Central Bank have signed off on Bulgaria joining the euro zone.",
+    "url": "https://www.cnbc.com/2025/06/10/bulgaria-is-set-to-join-the-euro-zone-but-is-that-a-good-idea.html",
+    "source": "CNBC",
+    "sentiment_score": -0.3153,
+    "sentiment_label": "negative"
+  },
+  {
+    "date": "2025-06-06",
+    "ticker": "ALV",
+    "company_name": "Allianz SE",
+    "title": "US markets are no longer safe for investments, Carmignac says",
+    "description": "The Wall Street consensus is that the tax provision would further undermine confidence in US assets, already shaken by Trump’s trade policies and America’s deteriorating fiscal accounts",
+    "url": "https://www.bloomberg.com/news/articles/2025-06-06/us-markets-are-no-longer-safe-for-investments-carmignac-says",
+    "source": "Bloomberg",
+    "sentiment_score": 0.4939,
+    "sentiment_label": "positive"
+  }
+]

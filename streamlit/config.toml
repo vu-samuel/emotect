@@ -1,0 +1,8 @@
+# .streamlit/config.toml
+[theme]
+base = "light"
+primaryColor = "#1b3c6e"         # EMOTECT dark blue
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f9f9f9"
+textColor = "#333333"
+font = "sans serif"

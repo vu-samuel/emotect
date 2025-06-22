@@ -1,0 +1,13 @@
+[
+  {
+    "date": "2025-06-13",
+    "ticker": "BMW",
+    "company_name": "BMW AG",
+    "title": "China's tight grip on rare earths shows little sign of weakening",
+    "description": "Despite Beijing's signal to ease rare earth exports, global supply cutoffs will remain an ever-present threat, experts warned.",
+    "url": "https://www.cnbc.com/2025/06/13/chinas-tight-grip-on-rare-earths-shows-little-sign-of-weakening.html",
+    "source": "CNBC",
+    "sentiment_score": -0.617,
+    "sentiment_label": "negative"
+  }
+]
