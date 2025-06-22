@@ -16,4 +16,4 @@ def offer_html_download(html_out: str, filename: str = "report.html"):
         mime="text/html"
     )
 
-    st.info("Tipp: Nach dem Öffnen im Browser einfach **Strg + P** drücken und als PDF speichern.")
+    st.info("Tip: After opening in the browser, simply press **Ctrl + P** to save as a PDF.")
