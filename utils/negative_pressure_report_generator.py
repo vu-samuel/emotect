@@ -6,6 +6,7 @@ import plotly.express as px
 import pandas as pd
 from utils.html_export_utils import offer_html_download
 
+# === Template Setup ===
 template_dir = Path(__file__).resolve().parent.parent / "templates"
 template_file = "pressure_report.html"
 env = Environment(loader=FileSystemLoader(str(template_dir)))
@@ -63,4 +64,9 @@ def generate_pressure_html(ticker, volcano_df, weekly_df, date_range_str):
     }
 
     html_out = template.render(**context)
-    offer_html_download(html_out, filename=f"EMOTECT_PressureReport_{ticker}_{datetime.now().strftime('%Y%m%d')}.html")
+
+    # 🔁 Use HTML Export Function
+    filename = f"EMOTECT_PressureReport_{ticker}_{datetime.now().strftime('%Y%m%d')}.html"
+    offer_html_download(html_out, filename=filename)
+
+    return Path(filename)  # for ZIP or PDF fallback (optional)

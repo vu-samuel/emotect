@@ -187,7 +187,7 @@ if selected_tickers:
 
 # === Optional HTML Export ===
 st.markdown("---")
-st.markdown("### Export EmotiForecast Report")
+st.markdown("### Export EmotectForecast Report")
 generate_emomood_html(
     highlight_df,
     date_range_str
