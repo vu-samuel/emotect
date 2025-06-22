@@ -5,8 +5,8 @@ import sys
 import os
 from pathlib import Path
 from datetime import datetime, timedelta
-from utils.emomood_pdf_generator import generate_emomood_html
-
+from utils.emomood_report_generator import generate_emomood_html
+import matplotlib
 # === Farben definieren ===
 PRIMARY_BLUE = "#0F4C81"
 SOFT_GRAY = "#f9f9f9"
