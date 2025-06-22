@@ -30,7 +30,7 @@ def save_pressure_chart(weekly_df, ticker, title, filename):
     )
     fig.update_layout(height=300, margin=dict(l=20, r=20, t=40, b=20))
     tmp_img = Path(tempfile.gettempdir()) / filename
-    fig.write_image(str(tmp_img), scale=2)
+    #fig.write_image(str(tmp_img), scale=2)
     return tmp_img
 
 def generate_pressure_html(ticker, volcano_df, weekly_df, date_range_str):
