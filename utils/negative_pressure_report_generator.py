@@ -4,16 +4,13 @@ from jinja2 import Environment, FileSystemLoader
 import tempfile
 import plotly.express as px
 import pandas as pd
-import pdfkit
+from weasyprint import HTML
 
 # === Setup ===
 TEMPLATE_DIR = Path(__file__).resolve().parent.parent / "templates"
 TEMPLATE_FILE = "pressure_report.html"
 env = Environment(loader=FileSystemLoader(str(TEMPLATE_DIR)))
 template = env.get_template(TEMPLATE_FILE)
-
-# === Optional: pdfkit configuration (streamlit cloud: no absolute path)
-config = pdfkit.configuration()  # If wkhtmltopdf is in PATH
 
 # === Chart Helper ===
 def save_pressure_chart(weekly_df, ticker, title, filename):
@@ -78,5 +75,5 @@ def generate_negative_pressure_pdf(ticker, volcano_df, weekly_df, date_range_str
     filename = f"EMOTECT_PressureReport_{ticker}_{datetime.now().strftime('%Y%m%d')}.pdf"
     filepath = Path(tempfile.gettempdir()) / filename
 
-    pdfkit.from_string(html_out, str(filepath), configuration=config)
+    HTML(string=html_out, base_url=str(TEMPLATE_DIR.resolve())).write_pdf(str(filepath))
     return filepath

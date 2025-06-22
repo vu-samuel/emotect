@@ -2,16 +2,13 @@ import os
 import tempfile
 import plotly.graph_objects as go
 from jinja2 import Environment, FileSystemLoader
-from wordcloud import WordCloud
 from pathlib import Path
 import pandas as pd
 import sys
 from datetime import datetime
-import pdfkit
+from weasyprint import HTML
 
-# === Configuration for Streamlit Cloud ===
-config = pdfkit.configuration(wkhtmltopdf='/usr/bin/wkhtmltopdf')
-
+# === Projekt-Config laden ===
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 from config import COMPANY_INFO
 
@@ -91,20 +88,16 @@ def generate_zscore_pdf(ticker, df_daily, company_name=None, article_snippets=No
             window=window,
             latest_z=latest_z,
             zscore_status=zscore_status,
-            zscore_plot_path=zscore_plot_path,
-            gauge_path=gauge_path,
+            zscore_plot_path=Path(zscore_plot_path).resolve().as_uri(),
+            gauge_path=Path(gauge_path).resolve().as_uri(),
             extreme_table=extreme_table,
             now=datetime.now().strftime("%Y-%m-%d %H:%M")
         )
 
-        # === Save PDF ===
-        pdf_path = os.path.join(tmpdir, f"Zscore_Report_{ticker}_{datetime.now().date()}.pdf")
-        pdfkit.from_string(html_out, str(pdf_path), configuration=config)
-
-        # === Final Copy
-        final_path = os.path.join("exports", os.path.basename(pdf_path))
+        # === Save PDF with WeasyPrint ===
+        pdf_path = os.path.join("exports", f"Zscore_Report_{ticker}_{datetime.now().date()}.pdf")
         os.makedirs("exports", exist_ok=True)
-        with open(pdf_path, "rb") as src, open(final_path, "wb") as dst:
-            dst.write(src.read())
 
-        return Path(final_path)
+        HTML(string=html_out, base_url=str(TEMPLATE_DIR.resolve())).write_pdf(pdf_path)
+
+        return Path(pdf_path)

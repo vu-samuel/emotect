@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 from jinja2 import Environment, FileSystemLoader
-import pdfkit
+from weasyprint import HTML
 from pathlib import Path
 import tempfile
 from datetime import datetime
@@ -69,11 +69,11 @@ def generate_reputation_pdf(ticker, df_filtered, start_date, end_date):
         logo_path=Path("assets/emotect_logo.png").resolve().as_uri()
     )
 
-    # === PDF File Name with Dates
+    # === PDF File Name with Dates ===
     pdf_filename = f"{ticker}_Reputation_{start_date.strftime('%Y%m%d')}_{end_date.strftime('%Y%m%d')}.pdf"
     pdf_path = Path(tempfile.gettempdir()) / pdf_filename
 
-    # === Export via pdfkit
-    pdfkit.from_string(html_out, str(pdf_path))  # optional: configuration=config
+    # === Export via WeasyPrint ===
+    HTML(string=html_out, base_url=str(template_dir.resolve())).write_pdf(str(pdf_path))
 
     return pdf_path
