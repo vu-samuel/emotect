@@ -122,7 +122,7 @@
 
     <h2>Weekly Pressure Trend</h2>
     <div class="chart">
-        <img src="{{ line_chart_path }}" alt="Pressure Chart">
+        <div>{{ chart_html | safe }}</div>
     </div>
 
     <h2>Weekly Pressure Table</h2>

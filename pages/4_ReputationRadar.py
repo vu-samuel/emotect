@@ -41,10 +41,9 @@ with col1:
         st.warning("Logo fehlt.")
 with col2:
     st.markdown("""
-    <h1 style='margin-bottom: 0; color: #0F4C81; font-size: 32px;'>EMOTECT – Sentiment Volcano</h1>
-    <p style='color: #666; font-size: 14px; margin-top: 4px;'>Emotional Risk Detection for Corporate Decision-Makers</p>
+    <h1 style='margin-bottom: 0; color: #0F4C81; font-size: 32px;'>EMOTECT – Reputation Radar</h1>
+    <p style='color: #666; font-size: 14px; margin-top: 4px;'>ESG Risk Detection from News Sentiment</p>
     """, unsafe_allow_html=True)
-
 
 st.markdown("## 🧠 Reputation Radar")
 st.markdown("### 🔎 ESG Filter · Wordcloud · Source Analysis")
@@ -71,7 +70,6 @@ start_date, end_date = st.sidebar.date_input(
     max_value=max_date
 )
 
-
 # === Select Company ===
 selected_ticker = st.selectbox("Select Company", sorted(df["ticker"].unique()))
 
@@ -79,7 +77,6 @@ selected_ticker = st.selectbox("Select Company", sorted(df["ticker"].unique()))
 st.markdown(f"🗓️ **Selected Time Period:** `{start_date}` → `{end_date}`")
 
 df_selected = df[df["ticker"] == selected_ticker].copy()
-
 df_selected = df_selected[
     (df_selected["date"].dt.date >= start_date) & 
     (df_selected["date"].dt.date <= end_date)
@@ -150,10 +147,10 @@ if not df_esg_filtered.empty:
 else:
     st.info("No breakdown data to display.")
 
-# === PDF Export ===
-if st.button("📄 Export Reputation PDF"):
-    with st.spinner("Generating PDF report..."):
+# === HTML Export ===
+if st.button("📄 Export Reputation Report as HTML"):
+    with st.spinner("Generating HTML report..."):
         path = generate_reputation_html(selected_ticker, df_esg_filtered, start_date=start_date, end_date=end_date)
 
-        st.success("PDF ready.")
-        st.download_button("📥 Download PDF", open(path, "rb"), file_name=f"{selected_ticker}_reputation_report.pdf")
+        st.success("HTML report ready.")
+        st.download_button("📥 Download HTML Report", open(path, "rb"), file_name=f"{selected_ticker}_reputation_report.html", mime="text/html")

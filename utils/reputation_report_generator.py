@@ -23,10 +23,11 @@ def matches_esg_category(text):
     return matches
 
 def generate_reputation_html(ticker, df_filtered, start_date, end_date):
+    df_filtered = df_filtered.copy()
     df_filtered["esg_tags"] = df_filtered["combined_text"].apply(matches_esg_category)
 
     # === Wordcloud ===
-    wc_text = " ".join(df_filtered["combined_text"])
+    wc_text = " ".join(df_filtered["combined_text"].fillna(""))
     wc = WordCloud(width=800, height=300, background_color="white").generate(wc_text)
     wordcloud_path = Path(tempfile.NamedTemporaryFile(suffix=".png", delete=False).name)
     wc.to_file(wordcloud_path)
@@ -69,4 +70,10 @@ def generate_reputation_html(ticker, df_filtered, start_date, end_date):
         logo_path=Path("assets/emotect_logo.png").resolve().as_uri()
     )
 
-    offer_html_download(html_out, filename=f"{ticker}_Reputation_{start_date.strftime('%Y%m%d')}_{end_date.strftime('%Y%m%d')}.html")
+    offer_html_download(
+        html_out,
+        filename=f"{ticker}_Reputation_{start_date.strftime('%Y%m%d')}_{end_date.strftime('%Y%m%d')}.html"
+    )
+
+    return Path(tempfile.NamedTemporaryFile(suffix=".html", delete=False).name)
+

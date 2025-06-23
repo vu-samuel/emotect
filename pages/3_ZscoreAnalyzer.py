@@ -1,24 +1,12 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 from config import DUMMY_FULL_SENTIMENT_FILE, DUMMY_Z_SCORE_FILE, COMPANY_INFO, EMOTECT_LOGO
-from utils.zscore_report_generator import generate_zscore_html
+from utils.zscore_report_generator import generate_zscore_report_html
 from pathlib import Path
+
 # === Page Configuration ===
-st.set_page_config(layout="wide", page_title="🌋 EMOTECT | Z-Score Analyzer", page_icon="🌋")
+st.set_page_config(layout="wide", page_title="🌋 EMOTECT | Crisis Pressure Tracker", page_icon="🌋")
 st.markdown("""
 <style>
     html, body, [class*="css"] { margin: 0; padding: 0; }
@@ -27,7 +15,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# === Logo und Header
+# === Logo und Header ===
 logo_path = Path(__file__).resolve().parent.parent / "assets" / "emotect_logo.png"
 col1, col2 = st.columns([0.1, 0.9])
 with col1:
@@ -41,7 +29,7 @@ with col2:
     <p style='color: #666; font-size: 14px; margin-top: 4px;'>Emotional Risk Detection for Corporate Decision-Makers</p>
     """, unsafe_allow_html=True)
 
-st.title("Z-Score Analyzer – Detect Emotional Extremes")
+st.title("Emoquake – Detect Emotional Extremes")
 
 # === Company Selection ===
 company_options = {info["name"]: ticker for ticker, info in COMPANY_INFO.items()}
@@ -116,7 +104,7 @@ with col1:
 
 with col2:
     st.subheader(f"Z-Score for {selected_name} ({latest_date.date()})")
-   
+
     gauge_fig = go.Figure(go.Indicator(
         mode="gauge+number",
         value=latest_z,
@@ -162,11 +150,10 @@ threshold = st.slider("Z-Score Threshold", -5.0, 5.0, 2.0, step=0.1)
 extremes = df_daily[abs(df_daily["z_score"] >= threshold)]
 st.dataframe(extremes[["date", "sentiment_score", "z_score"]].sort_values("z_score", ascending=False))
 
-# === Export PDF ===
-if st.button("Export Z-Score Report as PDF"):
-    path = generate_zscore_html(ticker=ticker, df_daily=df_daily, company_name=selected_name, article_snippets=None)
-    st.success("PDF report created.")
-    st.download_button("Download PDF", open(path, "rb"), file_name=path.name)
+# === Export HTML Report ===
+st.markdown("---")
+st.markdown("### Export Z-Score Report")
+generate_zscore_report_html(ticker=ticker, df_daily=df_daily, company_name=selected_name)
 
 # === Save Z-Score File
 df_daily["ticker"] = ticker
