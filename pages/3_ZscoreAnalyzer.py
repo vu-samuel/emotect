@@ -159,3 +159,6 @@ generate_zscore_report_html(ticker=ticker, df_daily=df_daily, company_name=selec
 df_daily["ticker"] = ticker
 DUMMY_Z_SCORE_FILE.parent.mkdir(parents=True, exist_ok=True)
 df_daily.to_csv(DUMMY_Z_SCORE_FILE, index=False)
+
+
+# 🔁 dummy update to trigger streamlit refresh
