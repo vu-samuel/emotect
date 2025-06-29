@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>EMOTECT EmotiForecast Report – {{ company }}</title>
+    <title>EMOTECT Sentiment Report – {{ company }}</title>
     <style>
         body {
             font-family: "Helvetica", sans-serif;
@@ -10,7 +10,6 @@
             color: #1b1f2d;
             font-size: 13px;
         }
-
         .logo-header {
             display: flex;
             align-items: center;
@@ -19,17 +18,14 @@
             margin-bottom: 30px;
             padding-bottom: 10px;
         }
-
         .logo-header img {
             height: 40px;
         }
-
         h1 {
             font-size: 22px;
             margin: 0;
             color: #0F4C81;
         }
-
         h2 {
             font-size: 16px;
             margin-top: 30px;
@@ -37,11 +33,9 @@
             padding-bottom: 5px;
             color: #2c3e50;
         }
-
         .img-section {
             margin: 20px 0;
         }
-
         .img-section img {
             width: 100%;
             max-height: 300px;
@@ -49,37 +43,29 @@
             border: 1px solid #eee;
             padding: 5px;
         }
-
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
             font-size: 12px;
         }
-
         th, td {
             border: 1px solid #ccc;
             padding: 6px 8px;
             text-align: left;
         }
-
         th {
             background-color: #f4f4f4;
         }
-
         .footer {
-            position: fixed;
-            bottom: 20px;
-            left: 40px;
-            right: 40px;
             font-size: 11px;
             color: #888;
             border-top: 1px solid #ccc;
             padding-top: 6px;
             display: flex;
             justify-content: space-between;
+            margin-top: 40px;
         }
-
         .meta {
             font-size: 12px;
             color: #555;
@@ -91,43 +77,38 @@
 
     <div class="logo-header">
         <img src="{{ logo_path }}" alt="EMOTECT Logo">
-        <h1>Reputation Risk Report</h1>
+        <h1>EMOTECT Sentiment Report</h1>
     </div>
 
     <p class="meta"><strong>Company:</strong> {{ company }}<br>
     <strong>Period:</strong> {{ start_date }} to {{ end_date }}</p>
 
-    <h2>🧩 ESG Wordcloud</h2>
+    <h2>🌦️ Mood Weather Map</h2>
     <div class="img-section">
-        <img src="{{ wordcloud_path }}" alt="Wordcloud">
+        <img src="{{ weather_map_path }}" alt="Sentiment Weather Map">
     </div>
 
-    <h2>🧮 ESG Breakdown</h2>
-    <div class="img-section">
-        <img src="{{ esg_chart_path }}" alt="ESG Breakdown Chart">
-    </div>
-
-    {% if sources %}
-    <h2>📡 Source Table</h2>
+    <h2>🗂️ Daily Mood Summary</h2>
     <table>
         <thead>
             <tr>
-                <th>Source</th>
-                <th>Count</th>
+                <th>Date</th>
+                <th>Company</th>
+                <th>Mood</th>
+                <th>Avg Sentiment</th>
             </tr>
         </thead>
         <tbody>
-            {% for item in sources %}
+            {% for row in summary_table %}
             <tr>
-                <td>{{ item.Source }}</td>
-                <td>{{ item.Count }}</td>
+                <td>{{ row.date }}</td>
+                <td>{{ row.company }}</td>
+                <td>{{ row.mood }}</td>
+                <td>{{ row.avg_sentiment }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-    {% else %}
-    <p>No sources available.</p>
-    {% endif %}
 
     <div class="footer">
         <span>Generated on {{ generated_on }}</span>
