@@ -102,10 +102,33 @@ df["risk_hits_total"] = df["risk_hits_title"] + df["risk_hits_desc"]
 df_risky = df[df["risk_hits_total"] > 0].copy()
 
 # === Volcano-Level aggregieren
-volcano_df = df_risky.groupby("ticker")["risk_hits_total"].sum().reset_index()
-volcano_df.columns = ["ticker", "pressure"]
-volcano_df["level"] = volcano_df["pressure"].apply(classify_volcano_level)
-volcano_df["alert"] = volcano_df["pressure"].apply(classify_alert)
+# === Volcano-Level aggregieren & normalisieren
+volcano_df = df_risky.groupby("ticker").agg(
+    pressure=("risk_hits_total", "sum"),
+    article_count=("title", "count")
+).reset_index()
+
+# Anzahl der Tage im gewählten Intervall (mind. 1, damit keine Division durch 0)
+volcano_df["days"] = (end_date - start_date).days or 1
+
+# Normalisierung pro Tag
+volcano_df["normalized"] = volcano_df["pressure"] / volcano_df["days"]
+
+# Klassifikation basierend auf normalisiertem Druck
+def classify_volcano_level(normalized):
+    if normalized < 0.5: return "calm"
+    elif normalized < 1.5: return "smoking"
+    elif normalized < 3.0: return "red_hot"
+    return "eruption"
+
+def classify_alert(normalized):
+    if normalized >= 3.0: return "⚠️ ERUPTION ALERT"
+    elif normalized >= 1.5: return "🔶 Volcano Warning"
+    return None
+
+volcano_df["level"] = volcano_df["normalized"].apply(classify_volcano_level)
+volcano_df["alert"] = volcano_df["normalized"].apply(classify_alert)
+
 
 # === Standortdaten extrahieren
 location_df = pd.DataFrame([
@@ -162,7 +185,7 @@ for _, row in merged_df.iterrows():
     fig.add_trace(go.Scattergeo(
         lon=[row["lon"]],
         lat=[row["lat"]],
-        text=f"{row['name']}<br>{LEVEL_LABEL_MAP[row['level']]}<br>Pressure: {row['pressure']}<br>{row['alert'] or ''}",
+        text=f"{row['name']}<br>{LEVEL_LABEL_MAP[row['level']]}<br>Pressure: {row['pressure']}<br>Normalized: {row['normalized']:.2f}<br>{row['alert'] or ''}",
         mode="markers+text",
         textposition="top center",
         marker=dict(
@@ -198,10 +221,10 @@ if st.sidebar.checkbox("📘 Show Legend", value=True):
     st.sidebar.markdown("## Volcano Levels")
     st.sidebar.markdown("""
     <ul style="font-size: 15px;">
-        <li><span style="color:#2ecc71;">🟢 Calm</span> – 0–2</li>
-        <li><span style="color:#f1c40f;">🌫 Smoking</span> – 3–5</li>
-        <li><span style="color:#e67e22;">🔥 Red Hot</span> – 6–8</li>
-        <li><span style="color:#e74c3c;">💥 Eruption</span> – 9+</li>
+        <li><span style="color:#2ecc71;">🟢 Calm</span> – normalized &lt; 0.5</li>
+    <li><span style="color:#f1c40f;">🌫 Smoking</span> – 0.5–1.5</li>
+    <li><span style="color:#e67e22;">🔥 Red Hot</span> – 1.5–3.0</li>
+    <li><span style="color:#e74c3c;">💥 Eruption</span> – &gt; 3.0</li>
     </ul>
     """, unsafe_allow_html=True)
 
@@ -243,7 +266,7 @@ else:
 
 # === Tabelle anzeigen
 st.subheader("📋 Overview: Pressure-Level per Company")
-st.dataframe(volcano_df.sort_values("pressure", ascending=False), use_container_width=True)
+st.dataframe(volcano_df.sort_values("normalized", ascending=False), use_container_width=True)
 
 
 # === Zeitreihe: Druckentwicklung pro Unternehmen ===
@@ -281,11 +304,13 @@ filtered_weekly_df = weekly_df[weekly_df["ticker"].isin(user_selected)]
 # === Optional: Logarithmische Skalierung
 use_log = st.sidebar.checkbox("🔁 Log Y-Axis", value=False, key="log_scale_toggle")
 if not filtered_weekly_df.empty:
+    filtered_weekly_df["days"] = 7  # Wochenweise angenommen
+    filtered_weekly_df["normalized"] = filtered_weekly_df["risk_hits_total"] / filtered_weekly_df["days"]
     fig_weekly = px.line(
         filtered_weekly_df,
-        x="week", y="risk_hits_total", color="ticker",
-        labels={"risk_hits_total": "Pressure", "week": "Week"},
-        title="📊 Weekly Crisis Pressure per Company"
+        x="week", y="normalized", color="ticker",
+        labels={"normalized": "Normalized Pressure (per Day)", "week": "Week"},
+        title="📊 Weekly Crisis Pressure per Company (Normalized)"
     )
     fig_weekly.update_layout(
     height=500,
