@@ -163,18 +163,18 @@ if selected_tickers:
     selected_data["Avg Sentiment"] = selected_data["Avg Sentiment"].apply(lambda x: f"{x:.2f}")
     st.dataframe(selected_data, use_container_width=True)
 
-'''# === Export ===
-st.markdown("---")
-st.markdown("### Export EmotectForecast Report")
+# === Export ===
+#st.markdown("---")
+#st.markdown("### Export EmotectForecast Report")
 
-weather_map_path = "temp/weather_map.png"
-fig.write_image(weather_map_path, width=1000, height=800)
+#weather_map_path = "temp/weather_map.png"
+#fig.write_image(weather_map_path, width=1000, height=800)
 
-if st.button("📄 Generate Report as HTML"):
-    generate_emomood_html(
-        export_df=highlight_df,
-        company="Selected Companies",
-        start_date=start_date.strftime("%Y-%m-%d"),
-        end_date=end_date.strftime("%Y-%m-%d"),
-        weather_map_path=weather_map_path'
-'''    
+#if st.button("📄 Generate Report as HTML"):
+#    generate_emomood_html(
+#        export_df=highlight_df,
+#        company="Selected Companies",
+#        start_date=start_date.strftime("%Y-%m-%d"),
+#        end_date=end_date.strftime("%Y-%m-%d"),
+#        weather_map_path=weather_map_path)
+
