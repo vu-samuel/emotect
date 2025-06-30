@@ -205,10 +205,11 @@ if not df_esg_filtered.empty:
 else:
     st.info("No ESG data available for pie chart.")
 
-# === HTML Export ===
+'''# === HTML Export ===
 if st.button("📄 Export Reputation Report as HTML"):
     with st.spinner("Generating HTML report..."):
         path = generate_reputation_html(selected_ticker, df_esg_filtered, start_date=start_date, end_date=end_date)
 
         st.success("HTML report ready.")
         st.download_button("📥 Download HTML Report", open(path, "rb"), file_name=f"{selected_ticker}_reputation_report.html", mime="text/html")
+'''

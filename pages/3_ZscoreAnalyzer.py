@@ -150,7 +150,7 @@ threshold = st.slider("Z-Score Threshold", -5.0, 5.0, 2.0, step=0.1)
 extremes = df_daily[abs(df_daily["z_score"] >= threshold)]
 st.dataframe(extremes[["date", "sentiment_score", "z_score"]].sort_values("z_score", ascending=False))
 
-# === Export HTML Report ===
+'''# === Export HTML Report ===
 st.markdown("---")
 st.markdown("### Export Z-Score Report")
 generate_zscore_report_html(ticker=ticker, df_daily=df_daily, company_name=selected_name)
@@ -161,4 +161,4 @@ DUMMY_Z_SCORE_FILE.parent.mkdir(parents=True, exist_ok=True)
 df_daily.to_csv(DUMMY_Z_SCORE_FILE, index=False)
 
 
-# 🔁 dummy update to trigger streamlit refresh
+# 🔁 dummy update to trigger streamlit refresh'''

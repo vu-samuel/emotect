@@ -163,7 +163,7 @@ if selected_tickers:
     selected_data["Avg Sentiment"] = selected_data["Avg Sentiment"].apply(lambda x: f"{x:.2f}")
     st.dataframe(selected_data, use_container_width=True)
 
-# === Export ===
+'''# === Export ===
 st.markdown("---")
 st.markdown("### Export EmotectForecast Report")
 
@@ -176,5 +176,5 @@ if st.button("📄 Generate Report as HTML"):
         company="Selected Companies",
         start_date=start_date.strftime("%Y-%m-%d"),
         end_date=end_date.strftime("%Y-%m-%d"),
-        weather_map_path=weather_map_path
-    )
+        weather_map_path=weather_map_path'
+'''    
