@@ -169,7 +169,7 @@ if not df_esg_filtered.empty:
     explode = [0.05, 0.05, 0.05]
 
     import numpy as np  # required for angle calculations
-    fig, ax = plt.subplots(figsize=(3.5, 3.5), dpi=400)
+    fig, ax = plt.subplots(figsize=(2.5, 2.5), dpi=350)
     wedges, _ = ax.pie(
         values,
         explode=explode,
@@ -188,7 +188,7 @@ if not df_esg_filtered.empty:
         connector_y = 0.85 * np.sin(np.deg2rad(angle))
         ax.plot([connector_x, x], [connector_y, y], color='gray', lw=0.8)
         ax.text(x, y, f"{label}\n{value:.1f}%", ha='center', va='center',
-                fontsize=7.5, bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="gray", lw=0.5))
+                fontsize=3.5, bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="gray", lw=0.5))
 
     # Draw donut hole
     centre_circle = plt.Circle((0, 0), 0.70, fc='white')
@@ -196,9 +196,9 @@ if not df_esg_filtered.empty:
 
     # Add central annotation
     ax.text(0, 0, f"{len(df_esg_filtered)}\narticles", ha='center', va='center',
-            fontsize=9, color='gray')
+            fontsize=5, color='gray')
 
-    ax.set_title("ESG Breakdown – Relative Share", fontsize=10, pad=10)
+    ax.set_title("ESG Breakdown – Relative Share", fontsize=5, pad=10)
     plt.tight_layout(pad=1.0)
     st.pyplot(fig)
 
