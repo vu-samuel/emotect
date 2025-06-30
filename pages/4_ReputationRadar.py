@@ -162,7 +162,7 @@ if not df_esg_filtered.empty:
     colors = ["#C0392B", "#7F8C8D", "#2980B9"]  # EMOTECT-Farben
     explode = [0.05, 0.05, 0.05]
 
-    fig, ax = plt.subplots(figsize=(5, 5), dpi=300)
+    fig, ax = plt.subplots(figsize=(3, 3), dpi=300)
     wedges, texts, autotexts = ax.pie(
         values,
         labels=labels,
