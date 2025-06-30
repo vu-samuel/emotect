@@ -147,6 +147,30 @@ if not df_esg_filtered.empty:
 else:
     st.info("No breakdown data to display.")
 
+# === ESG Pie Chart Aggregation ===
+st.markdown("#### 🧮 ESG Category Breakdown (Aggregate)")
+
+if not df_esg_filtered.empty:
+    total_counts = {
+        "E": df_esg_filtered["E_count"].sum(),
+        "S": df_esg_filtered["S_count"].sum(),
+        "G": df_esg_filtered["G_count"].sum()
+    }
+    pie_df = pd.DataFrame.from_dict(total_counts, orient='index', columns=['Mentions']).reset_index()
+    pie_df.columns = ['Category', 'Mentions']
+
+    fig_pie = px.pie(
+        pie_df,
+        names="Category",
+        values="Mentions",
+        title="Total ESG Keyword Mentions",
+        color_discrete_map={"E": "green", "S": "blue", "G": "orange"}
+    )
+    st.plotly_chart(fig_pie, use_container_width=True)
+else:
+    st.info("No ESG data available for pie chart.")
+
+
 # === HTML Export ===
 if st.button("📄 Export Reputation Report as HTML"):
     with st.spinner("Generating HTML report..."):

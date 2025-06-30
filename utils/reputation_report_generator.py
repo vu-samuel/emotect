@@ -32,20 +32,39 @@ def generate_reputation_html(ticker, df_filtered, start_date, end_date):
     wordcloud_path = Path(tempfile.NamedTemporaryFile(suffix=".png", delete=False).name)
     wc.to_file(wordcloud_path)
 
-    # === ESG Breakdown Chart ===
+    # === ESG Breakdown Bar Chart ===
     esg_counts = {"E": 0, "S": 0, "G": 0}
     for tags in df_filtered["esg_tags"]:
         for tag in tags:
             esg_counts[tag] += 1
 
-    esg_chart_path = Path(tempfile.NamedTemporaryFile(suffix=".png", delete=False).name)
+    # === ESG Breakdown Bar Chart (EMOTECT Farben + Legende) ===
+    esg_bar_path = Path(tempfile.NamedTemporaryFile(suffix=".png", delete=False).name)
     plt.figure(figsize=(5, 3))
-    plt.bar(esg_counts.keys(), esg_counts.values(), color=["green", "blue", "orange"])
-    plt.title("ESG Breakdown")
+    bar_colors = ["#C0392B", "#7F8C8D", "#2980B9"]  # Rot, Grau, Blau
+    plt.bar(esg_counts.keys(), esg_counts.values(), color=bar_colors)
+    plt.title("ESG Breakdown – Total Mentions", fontsize=11)
     plt.ylabel("Mentions")
+    plt.xticks(list(esg_counts.keys()), ['E (Environmental)', 'S (Social)', 'G (Governance)'])
     plt.tight_layout()
-    plt.savefig(esg_chart_path)
+    plt.savefig(esg_bar_path)
     plt.close()
+
+    # === ESG Breakdown Pie Chart (EMOTECT Farben + Legende) ===
+    esg_pie_path = Path(tempfile.NamedTemporaryFile(suffix=".png", delete=False).name)
+    plt.figure(figsize=(4, 4))
+    plt.pie(
+        esg_counts.values(),
+        labels=['Environmental', 'Social', 'Governance'],
+        autopct='%1.1f%%',
+        colors=bar_colors,
+        startangle=140
+    )
+    plt.title("ESG Breakdown – Relative Share", fontsize=11)
+    plt.tight_layout()
+    plt.savefig(esg_pie_path)
+    plt.close()
+
 
     # === Source Table ===
     sources = []
@@ -62,7 +81,8 @@ def generate_reputation_html(ticker, df_filtered, start_date, end_date):
     html_out = template.render(
         company=ticker,
         wordcloud_path=wordcloud_path.resolve().as_uri(),
-        esg_chart_path=esg_chart_path.resolve().as_uri(),
+        esg_bar_path=esg_bar_path.resolve().as_uri(),
+        esg_pie_path=esg_pie_path.resolve().as_uri(),
         sources=sources,
         start_date=start_date.strftime("%Y-%m-%d"),
         end_date=end_date.strftime("%Y-%m-%d"),
@@ -76,4 +96,3 @@ def generate_reputation_html(ticker, df_filtered, start_date, end_date):
     )
 
     return Path(tempfile.NamedTemporaryFile(suffix=".html", delete=False).name)
-
