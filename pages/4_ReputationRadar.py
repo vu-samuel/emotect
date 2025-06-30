@@ -147,8 +147,8 @@ if not df_esg_filtered.empty:
 else:
     st.info("No breakdown data to display.")
 
-# === ESG Pie Chart Aggregation ===
-st.markdown("#### 🧮 ESG Category Breakdown (Aggregate)")
+# === ESG Pie Chart (matplotlib) im EMOTECT-Stil ===
+st.markdown("#### 📊 ESG Breakdown – EMOTECT Pie Chart Style")
 
 if not df_esg_filtered.empty:
     total_counts = {
@@ -156,19 +156,25 @@ if not df_esg_filtered.empty:
         "S": df_esg_filtered["S_count"].sum(),
         "G": df_esg_filtered["G_count"].sum()
     }
-    pie_df = pd.DataFrame.from_dict(total_counts, orient='index', columns=['Mentions']).reset_index()
-    pie_df.columns = ['Category', 'Mentions']
 
-    fig_pie = px.pie(
-        pie_df,
-        names="Category",
-        values="Mentions",
-        title="Total ESG Keyword Mentions",
-        color_discrete_map={"E": "green", "S": "blue", "G": "orange"}
+    labels = ['Environmental', 'Social', 'Governance']
+    values = [total_counts["E"], total_counts["S"], total_counts["G"]]
+    colors = ["#C0392B", "#7F8C8D", "#2980B9"]  # EMOTECT-Farben
+
+    fig, ax = plt.subplots(figsize=(4, 4))
+    wedges, texts, autotexts = ax.pie(
+        values,
+        labels=labels,
+        autopct='%1.1f%%',
+        colors=colors,
+        startangle=140,
+        textprops={'fontsize': 10}
     )
-    st.plotly_chart(fig_pie, use_container_width=True)
+    ax.set_title("ESG Breakdown – Relative Share (EMOTECT Style)", fontsize=11)
+    st.pyplot(fig)
 else:
     st.info("No ESG data available for pie chart.")
+
 
 
 # === HTML Export ===
