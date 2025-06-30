@@ -162,32 +162,42 @@ if not df_esg_filtered.empty:
     colors = ["#C0392B", "#7F8C8D", "#2980B9"]  # EMOTECT-Farben
     explode = [0.05, 0.05, 0.05]
 
-    fig, ax = plt.subplots(figsize=(3, 3), dpi=400)
-    wedges, texts, autotexts = ax.pie(
+    import numpy as np  # required for angle calculations
+    fig, ax = plt.subplots(figsize=(3.5, 3.5), dpi=400)
+    wedges, _ = ax.pie(
         values,
-        labels=labels,
-        autopct='%1.1f%%',
+        explode=explode,
         colors=colors,
         startangle=140,
-        explode=explode,
-        shadow=False,
-        textprops={'fontsize': 10, 'color': 'black'},
-        pctdistance=0.85  # move percentages outward
+        wedgeprops=dict(width=0.3, edgecolor='white'),
+        labels=None
     )
 
-    # Optional: create donut hole
+    # Draw external labels with connectors
+    for wedge, label, value in zip(wedges, labels, values):
+        angle = (wedge.theta2 + wedge.theta1) / 2.0
+        x = 1.1 * np.cos(np.deg2rad(angle))
+        y = 1.1 * np.sin(np.deg2rad(angle))
+        connector_x = 0.85 * np.cos(np.deg2rad(angle))
+        connector_y = 0.85 * np.sin(np.deg2rad(angle))
+        ax.plot([connector_x, x], [connector_y, y], color='gray', lw=0.8)
+        ax.text(x, y, f"{label}\n{value:.1f}%", ha='center', va='center',
+                fontsize=7.5, bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="gray", lw=0.5))
+
+    # Draw donut hole
     centre_circle = plt.Circle((0, 0), 0.70, fc='white')
-    fig.gca().add_artist(centre_circle)
+    ax.add_artist(centre_circle)
 
-    ax.set_title("Relative Shares", fontsize=10, pad=10)
+    # Add central annotation
+    ax.text(0, 0, f"{len(df_esg_filtered)}\narticles", ha='center', va='center',
+            fontsize=9, color='gray')
+
+    ax.set_title("ESG Breakdown – Relative Share", fontsize=10, pad=10)
     plt.tight_layout(pad=1.0)
-
     st.pyplot(fig)
+
 else:
     st.info("No ESG data available for pie chart.")
-
-
-
 
 # === HTML Export ===
 if st.button("📄 Export Reputation Report as HTML"):
