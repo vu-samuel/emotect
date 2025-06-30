@@ -200,7 +200,10 @@ if not df_esg_filtered.empty:
 
     ax.set_title("ESG Breakdown – Relative Share", fontsize=5, pad=10)
     plt.tight_layout(pad=1.0)
-    st.pyplot(fig)
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        st.pyplot(fig)
+
 
 else:
     st.info("No ESG data available for pie chart.")
