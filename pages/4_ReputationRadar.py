@@ -148,7 +148,7 @@ else:
     st.info("No breakdown data to display.")
 
 # === ESG Pie Chart (matplotlib) im EMOTECT-Stil ===
-st.markdown("#### 📊 ESG Breakdown – EMOTECT Pie Chart Style")
+st.markdown("#### 📊 ESG Breakdown – EMOTECT Pie Chart")
 
 if not df_esg_filtered.empty:
     total_counts = {
@@ -160,20 +160,32 @@ if not df_esg_filtered.empty:
     labels = ['Environmental', 'Social', 'Governance']
     values = [total_counts["E"], total_counts["S"], total_counts["G"]]
     colors = ["#C0392B", "#7F8C8D", "#2980B9"]  # EMOTECT-Farben
+    explode = [0.05, 0.05, 0.05]
 
-    fig, ax = plt.subplots(figsize=(4, 4))
+    fig, ax = plt.subplots(figsize=(5, 5), dpi=300)
     wedges, texts, autotexts = ax.pie(
         values,
         labels=labels,
         autopct='%1.1f%%',
         colors=colors,
         startangle=140,
-        textprops={'fontsize': 10}
+        explode=explode,
+        shadow=False,
+        textprops={'fontsize': 10, 'color': 'black'},
+        pctdistance=0.85  # move percentages outward
     )
-    ax.set_title("ESG Breakdown – Relative Share (EMOTECT Style)", fontsize=11)
+
+    # Optional: create donut hole
+    centre_circle = plt.Circle((0, 0), 0.70, fc='white')
+    fig.gca().add_artist(centre_circle)
+
+    ax.set_title("Relative Shares", fontsize=10)
+    plt.tight_layout(pad=2.0)
+
     st.pyplot(fig)
 else:
     st.info("No ESG data available for pie chart.")
+
 
 
 
