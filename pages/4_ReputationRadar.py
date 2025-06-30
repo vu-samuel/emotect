@@ -158,7 +158,13 @@ if not df_esg_filtered.empty:
     }
 
     labels = ['Environmental', 'Social', 'Governance']
-    values = [total_counts["E"], total_counts["S"], total_counts["G"]]
+    total_mentions = sum(total_counts.values())
+    values = [
+        total_counts["E"] / total_mentions * 100 if total_mentions > 0 else 0,
+        total_counts["S"] / total_mentions * 100 if total_mentions > 0 else 0,
+        total_counts["G"] / total_mentions * 100 if total_mentions > 0 else 0
+]
+
     colors = ["#C0392B", "#7F8C8D", "#2980B9"]  # EMOTECT-Farben
     explode = [0.05, 0.05, 0.05]
 
